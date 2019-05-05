@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+ruby '2.6.3'
+
+gem 'benchmark-ips', require: 'benchmark/ips'
+gem 'dotenv', require: false
+gem 'dry-struct'
+gem 'dry-types'
+gem 'faraday'
+gem 'pry'
+gem 'puma'
+gem 'roda'
+gem 'super', path: File.expand_path('../../')
