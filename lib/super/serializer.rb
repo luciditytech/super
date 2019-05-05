@@ -10,24 +10,32 @@ module Super
     end
 
     module ClassMethods
-      def field(name, options = {})
-        schema[name] = options
+      def root(name)
+        schema[:root] = name
+      end
+
+      def attribute(name, options = {})
+        schema[:attributes][name] = options
+      end
+
+      def postprocess(processor = nil, &block)
+        schema[:postprocess] = processor.nil? ? block : processor
       end
 
       def schema
-        @schema ||= {}
+        @schema ||= {
+          attributes: {}
+        }
       end
     end
 
     module InstanceMethods
-      def call(entity)
-        @entity = entity
+      def call(entity, options = {})
+        @entity = entity.is_a?(Hash) ? OpenStruct.new(entity) : entity
+        result = serialize_entity
+        result = postprocess(result, options)
 
-        {}.tap do |data|
-          schema.each do |key, options|
-            data[key] = extract_and_encode(key, options)
-          end
-        end
+        format(result)
       end
 
       private
@@ -36,6 +44,28 @@ module Super
 
       def schema
         self.class.schema
+      end
+
+      def postprocess(result, options)
+        postprocessor = schema[:postprocess]
+        return result if postprocessor.nil?
+        return send(postprocessor, result, options) if postprocessor.is_a?(Symbol)
+
+        postprocessor.call(result, options)
+      end
+
+      def format(result)
+        return result if schema[:root].nil?
+
+        { schema[:root] => result }
+      end
+
+      def serialize_entity
+        {}.tap do |data|
+          schema[:attributes].each do |key, options|
+            data[key] = extract_and_encode(key, options)
+          end
+        end
       end
 
       def extract_and_encode(key, options)

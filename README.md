@@ -1,38 +1,103 @@
-# Super
+# Description
+**Super** aims to provide the essential building blocks for creating high-performance services. Those services may be APIs, queue workers, stream processors, communicate via message buses, etc. These building blocks may be used separately or together. Furthermore, these building blocks are intended to be simple, easily testable and fast.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/super`. To experiment with that code, run `bin/console` for an interactive prompt.
+# Setup
 
-TODO: Delete this and the text above, and describe your gem
+You can install Super, which will include by default the core toolset.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
+```
 gem 'super'
 ```
 
-And then execute:
+# Usage
+## Service
+`Super::Service` are simple, single-use service objects that have a default public interface compatible with lambdas - `.call`. Example:
 
-    $ bundle
+```ruby
+class MessageService
+  include Super::Service
 
-Or install it yourself as:
+  def call(message)
+    @message = message
+    say_stuff
+  end
 
-    $ gem install super
+  private
 
-## Usage
+  def say_stuff
+    puts @message
+  end
+end
 
-TODO: Write usage instructions here
+MessageService.call('Hello World')
+"Hello World"
+```
 
-## Development
+# Component
+A `Super::Component` is a singleton - and therefore stateful - class that is useful to encapsulate database or HTTP adapters, amongst other things. Example:
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```ruby
+class RedisService
+  include Super::Component
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+  # Super::Component provides an easy way to define instance-level attributes.
+  inst_accessor :adapter
 
-## Contributing
+  # you can also easily define the public interface of this component.
+  interface :get, :set
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/super.
+  def get(key)
+    adapter.get(key)
+  end
+
+  def set(key, value)
+    adapter.set(key, value)
+  end
+end
+
+# In an initializer somewhere.
+RedisService.adapter = Redis.new
+
+# In your code.
+RedisService.set('message', 'Hello World')
+```
+
+## Serializer
+`Super::Serializer` is designed to be easily testable - you can just provide it with a double for instance - and **fast**. In fact, it can be 10X+ faster than `ActiveModel::Serializer` for most types of objects used in real world applications.
+
+```ruby
+class EntrySerializer
+  include Super::Serializer
+
+  field :id
+  field :timestamp, with: ->(timestamp) { timestamp&.iso8601 }
+  field :message, with: MessageSerializer
+end
+
+class MessageSerializer
+  include Super::Serializer
+
+  field :content
+
+  def content
+    entity.content.downcase
+  end
+end
+
+entry = Entry.new(...)
+
+EntrySerializer.call(entry)
+{
+  id: '47199a36-38bb-427c-a7ae-ffbb28614b56',
+  timestamp: '2019-05-04T18:03:18+02:00',
+  message: {
+    content: 'test'
+  }
+}
+```
+
+## Application
+Check out the test application under `spec/tester` for an example of `Super::Application`. In short, it provides basic mechanisms for providing autoloading, configuration management, interactive consoles, initializers, testing and more!
 
 ## License
 

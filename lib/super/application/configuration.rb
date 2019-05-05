@@ -1,25 +1,22 @@
+require 'ostruct'
+
 module Super
   class Application
-    class Configuration
-      attr_writer :root_path,
-                  :settings_path,
-                  :load_paths,
-                  :initializers_path
-
+    class Configuration < OpenStruct
       def root_path
-        @root_path ||= ENV['APPLICATION_ROOT']
+        self[:root_path] ||= ENV['APPLICATION_ROOT']
       end
 
       def initializers_path
-        @initializers_path ||= expand_path('config/initializers')
+        self[:initializers_path] ||= expand_path('config/initializers')
       end
 
       def settings_path
-        @settings_path ||= expand_path('config/settings.yml')
+        self[:settings_path] ||= expand_path('config/settings.yml')
       end
 
       def load_paths
-        @load_paths ||= []
+        self[:load_paths] ||= []
       end
 
       private

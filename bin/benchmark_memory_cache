@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'super'
+require 'ostruct'
+require 'super/memory_cache'
+require 'benchmark/ips'
+
+data = Array.new(10_000) do
+  OpenStruct.new(
+    id: SecureRandom.uuid,
+    timestamp: Time.now.utc,
+    type: 'impression'
+  )
+end
+
+cache = Super::MemoryCache
+cache.max_size = 1000
+
+Benchmark.ips do |x|
+  x.report do
+    event = data.sample
+
+    cache.fetch(event.id) { event }
+  end
+end

@@ -4,8 +4,15 @@ module Super
       base.extend(ClassMethods)
 
       base.class_eval do
-        include Singleton
         extend SingleForwardable
+
+        def self.instance
+          @instance ||= new
+        end
+
+        def self.instance=(value)
+          @instance = value
+        end
       end
     end
 
@@ -15,19 +22,25 @@ module Super
         return def_delegator(:instance, args) if args.is_a?(Symbol)
       end
 
-      def inst_accessor(method)
-        inst_reader(method)
-        inst_writer(method)
+      def inst_accessor(*args)
+        args.each do |method|
+          inst_reader(method)
+          inst_writer(method)
+        end
       end
 
-      def inst_reader(method)
-        attr_reader(method)
-        def_delegator(:instance, method)
+      def inst_reader(*args)
+        args.each do |method|
+          attr_reader(method)
+          def_delegator(:instance, method)
+        end
       end
 
-      def inst_writer(method)
-        attr_writer(method)
-        def_delegator(:instance, "#{method}=")
+      def inst_writer(*args)
+        args.each do |method|
+          attr_writer(method)
+          def_delegator(:instance, "#{method}=")
+        end
       end
     end
   end

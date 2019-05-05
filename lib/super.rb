@@ -1,6 +1,6 @@
 require 'singleton'
-require 'bundler/setup'
 require 'zeitwerk'
+require 'concurrent'
 
 require_relative 'super/version'
 require_relative 'super/service'
