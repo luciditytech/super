@@ -19,6 +19,10 @@ module Super
         self[:load_paths] ||= []
       end
 
+      def logger
+        self[:logger] ||= Logger.new(STDOUT)
+      end
+
       private
 
       def expand_path(path)

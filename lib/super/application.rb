@@ -8,9 +8,8 @@ module Super
     interface :configuration,
               :configure,
               :boot,
-              :reload
-
-    inst_accessor :loader
+              :reload,
+              :logger
 
     def configure(*)
       yield(configuration)
@@ -22,6 +21,10 @@ module Super
 
     def boot
       Booter.call(self)
+    end
+
+    def logger
+      configuration.logger
     end
 
     def reload
