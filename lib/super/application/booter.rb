@@ -7,7 +7,7 @@ module Super
       extend Forwardable
 
       def call(app)
-        @app = app
+        @app = WeakRef.new(app)
         app.loader = setup_loader(load_paths)
         load_settings(settings_path)
         load_initializers(initializers_path)
