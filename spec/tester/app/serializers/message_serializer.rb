@@ -1,7 +1,7 @@
 class MessageSerializer
   include Super::Serializer
 
-  field :content
+  attribute :content
 
   def content
     entity.content.downcase
