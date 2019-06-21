@@ -5,6 +5,8 @@ module Super
   class Application
     include Component
 
+    inst_accessor :loader
+
     interface :configuration,
               :configure,
               :boot,

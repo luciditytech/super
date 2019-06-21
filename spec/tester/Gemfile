@@ -10,4 +10,10 @@ gem 'faraday'
 gem 'pry'
 gem 'puma'
 gem 'roda'
-gem 'super', path: File.expand_path('../../')
+gem 'super', path: File.expand_path('../../'),
+             require: %w[super
+                         super/application
+                         super/serializer
+                         super/service
+                         super/component
+                         super/memory_cache]

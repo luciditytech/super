@@ -1,5 +1,2 @@
-require 'super/cache'
-
-class Cache
-  include Super::Cache
+class Cache < Super::MemoryCache
 end

@@ -3,9 +3,9 @@ class EntrySerializer
 
   root :data
 
-  field :id
-  field :timestamp, with: ->(timestamp) { timestamp&.iso8601 }
-  field :message, with: MessageSerializer
+  attribute :id
+  attribute :timestamp, with: ->(timestamp) { timestamp&.iso8601 }
+  attribute :message, with: MessageSerializer
 
   postprocess do |result, options|
     result.tap do |r|
