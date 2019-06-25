@@ -2,6 +2,7 @@ require 'singleton'
 require 'zeitwerk'
 require 'concurrent'
 require 'time'
+require 'weakref'
 
 require_relative 'super/version'
 require_relative 'super/service'
