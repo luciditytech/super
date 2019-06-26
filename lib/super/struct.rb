@@ -1,5 +1,6 @@
 require_relative 'struct/attribute'
 require_relative 'struct/schema'
+require_relative 'codecs/time_codec'
 
 module Super
   module Struct
@@ -38,14 +39,8 @@ module Super
       def attribute(name, options = {})
         schema[name] = options
         attribute = schema[name]
-
-        define_method(name) do
-          @attributes[name.to_sym]
-        end
-
-        define_method("#{name}=") do |value|
-          @attributes[name.to_sym] = attribute.decode(value)
-        end
+        define_method(name) { @attributes[name] }
+        define_method("#{name}=") { |value| @attributes[name] = attribute.decode(value) }
       end
 
       def schema
