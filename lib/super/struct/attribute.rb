@@ -33,7 +33,10 @@ module Super
       end
 
       def support_decoder_for(type)
-        codec = Kernel.const_get("Super::Codecs::#{type}Codec")&.new
+        codec_class = "Super::Codecs::#{type}Codec"
+        return unless Kernel.const_defined?(codec_class)
+
+        codec = Kernel.const_get(codec_class).new
         return unless codec
 
         ->(value) { codec.decode(value) }
