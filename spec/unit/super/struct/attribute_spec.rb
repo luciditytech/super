@@ -25,6 +25,42 @@ RSpec.describe Super::Struct::Attribute do
       end
     end
 
+    context 'when a type without a codec is defined' do
+      context 'and type has a native decode method' do
+        class DummyType
+          def real_value
+            'VALUE'
+          end
+
+          def self.decode(value)
+            value&.real_value
+          end
+        end
+
+        let(:options) { { type: DummyType } }
+
+        include_context 'and the value is nil'
+
+        context 'and the value is not nil' do
+          let(:value) { DummyType.new }
+
+          it { is_expected.to eq('VALUE') }
+        end
+      end
+
+      context 'and type does not have a native decode method' do
+        let(:options) { { type: Date } }
+
+        include_context 'and the value is nil'
+
+        context 'and the value is not nil' do
+          let(:value) { Date.new(2019, 6, 26) }
+
+          it { is_expected.to eq(value) }
+        end
+      end
+    end
+
     context 'when a Time is defined' do
       let(:options) { { type: Time } }
       let(:codec) { instance_double(Super::Codecs::TimeCodec) }

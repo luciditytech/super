@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2019-06-26
+### Fixed:
+- Attribute decoder error when attribute type is defined and codec doesn't exist.
+
 ## [0.3.0] - 2019-06-26
 ### Added:
 - Super Struct Attribute decoder support.
