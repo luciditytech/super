@@ -27,24 +27,25 @@ RSpec.describe Super::Struct::Attribute do
 
     context 'when a type without a codec is defined' do
       context 'and type has a native decode method' do
-        class DummyType
-          def real_value
-            'VALUE'
-          end
-
-          def self.decode(value)
-            value&.real_value
-          end
+        class DummyClass
+          include Super::Struct
+          attribute :id, type: String
         end
 
-        let(:options) { { type: DummyType } }
+        let(:options) { { type: DummyClass } }
 
         include_context 'and the value is nil'
 
-        context 'and the value is not nil' do
-          let(:value) { DummyType.new }
+        context 'and the value is the same type' do
+          let(:value) { DummyClass.new }
 
-          it { is_expected.to eq('VALUE') }
+          it { is_expected.to eq(value) }
+        end
+
+        context 'and the value is an attribute hash' do
+          let(:value) { { id: '1' } }
+
+          it { is_expected.to be_a(DummyClass) }
         end
       end
 

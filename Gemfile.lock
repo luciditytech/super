@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    super (0.3.1)
+    super (0.3.2)
       concurrent-ruby
       config
       zeitwerk

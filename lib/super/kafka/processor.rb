@@ -51,7 +51,12 @@ module Super
         @task.call(message.value)
         @consumer.mark_message_as_processed(message)
       rescue StandardError => e
-        puts e
+        messages = [e.message, *e.backtrace].join("\n")
+        logger.error(messages)
+      end
+
+      def logger
+        Application.logger
       end
     end
   end
