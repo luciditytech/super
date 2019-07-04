@@ -6,13 +6,17 @@ module Super
         @decoder = decoder_for(options)
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def decode(value)
-        return instance_exec(value, &@decoder) if @decoder
         return unless value
+        return value if @type && value.is_a?(@type)
+        return instance_exec(value, &@decoder) if @decoder
+
         raise Super::Errors::DecodeError if @type && !value.is_a?(@type)
 
         value
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
 
       private
 
