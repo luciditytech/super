@@ -8,8 +8,8 @@ module Super
 
       def call(app)
         @app = WeakRef.new(app)
-        app.loader = setup_loader(load_paths)
         load_settings(settings_path)
+        app.loader = setup_loader(load_paths)
         load_initializers(initializers_path)
       end
 
