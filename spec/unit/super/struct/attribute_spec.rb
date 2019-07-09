@@ -97,5 +97,41 @@ RSpec.describe Super::Struct::Attribute do
         it { is_expected.to eq(time) }
       end
     end
+
+    context 'when a Float is defined' do
+      let(:options) { { type: Float } }
+      let(:codec) { instance_double(Super::Codecs::FloatCodec) }
+
+      before do
+        allow(Super::Codecs::FloatCodec).to receive(:new).and_return(codec)
+      end
+
+      include_context 'and the value is nil' do
+        before do
+          allow(codec).to receive(:decode).with(value).and_return(nil)
+        end
+      end
+
+      context 'and the value is a Float object' do
+        let(:value) { 1.1 }
+
+        before do
+          allow(codec).to receive(:decode).with(value).and_return(value)
+        end
+
+        it { is_expected.to eq(value) }
+      end
+
+      context 'and the value is a String' do
+        let(:float) { 1.1 }
+        let(:value) { float.to_s }
+
+        before do
+          allow(codec).to receive(:decode).with(value).and_return(float)
+        end
+
+        it { is_expected.to eq(float) }
+      end
+    end
   end
 end
