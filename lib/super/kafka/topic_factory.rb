@@ -4,12 +4,12 @@ module Super
       include Super::Service
 
       def call(settings, stage)
-        default_topic = settings.topic
+        base_name = settings.topic
         max_try = settings.retries
-        return default_topic if stage.zero?
-        return default_topic + "-try-#{stage}" if stage <= max_try
+        return base_name if stage.zero?
+        return base_name + "-try-#{stage}" if stage <= max_try
 
-        default_topic + '-dlq'
+        base_name + '-dead'
       end
     end
   end
