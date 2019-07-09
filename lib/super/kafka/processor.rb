@@ -11,47 +11,57 @@ module Super
         @state = :offline
       end
 
-      def run(task)
+      def run(task, stage: 0)
         @task = task
-        setup_consumer
+        @stage = stage
+        Signal.trap('INT') { stop }
         start
       end
 
       def start
-        return if @consumer.nil?
-        return unless @state == :offline
+        return if consumer.nil?
+        return if @state == :online
 
-        Signal.trap('INT') { stop }
         @state = :online
-        @consumer.subscribe(@task.settings.topic)
+        consumer.subscribe(topic)
 
-        @consumer.each_message(automatically_mark_as_processed: false) do |message|
+        consumer.each_message(automatically_mark_as_processed: false) do |message|
+          throttle(message)
           process(message)
         end
       end
 
       def stop
-        @consumer.stop
+        consumer.stop
         @state = :offline
       end
 
       private
 
-      def setup_consumer
-        options = {
-          group_id: @task.settings.group_id,
-          offset_commit_interval: @task.settings.offset_commit_interval || 1,
-          offset_commit_threshold: @task.settings.offset_commit_threshold || 10
-        }.compact
+      def topic
+        @topic ||= TopicFactory.call(@task.settings, @stage)
+      end
 
-        @consumer = @adapter.consumer(options)
+      def next_stage_topic
+        @next_stage_topic ||= TopicFactory.call(@task.settings, @stage + 1)
+      end
+
+      def consumer
+        @consumer ||= ConsumerFactory.call(@task.settings, @adapter)
+      end
+
+      def throttle(message)
+        Governor.call(message, @task.settings, @stage)
       end
 
       def process(message)
-        @task.call(message.value)
-        @consumer.mark_message_as_processed(message)
-      rescue StandardError => e
-        puts e
+        ExecuteTask.call(
+          task: @task,
+          message: message,
+          consumer: consumer,
+          adapter: @adapter,
+          next_topic: next_stage_topic
+        )
       end
     end
   end

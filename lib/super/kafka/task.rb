@@ -3,6 +3,7 @@ module Super
     module Task
       DSL = %w[topic
                group_id
+               retries
                offset_commit_interval
                offset_commit_threshold].freeze
 
@@ -19,7 +20,7 @@ module Super
         end
 
         def settings
-          @settings ||= OpenStruct.new
+          @settings ||= TaskSettings.new
         end
       end
     end
