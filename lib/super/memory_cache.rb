@@ -1,3 +1,5 @@
+require 'weakref'
+
 require_relative 'memory_cache/lock'
 require_relative 'memory_cache/entry'
 require_relative 'memory_cache/node'
