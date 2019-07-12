@@ -1,3 +1,4 @@
+require 'zeitwerk'
 require_relative 'application/booter'
 require_relative 'application/configuration'
 
