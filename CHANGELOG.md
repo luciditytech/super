@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.5.0] - 2019-07-19
 ### Fixed
 - App settings load order.
 
@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.3.2] - 2019-07-04
 ### Fixed:
 - Attribute decoder error when attribute type is a Super::Struct object
+- Make kafka processor log to the application logger and print the backtrace.
 
 ## [0.3.1] - 2019-06-26
 ### Fixed:
