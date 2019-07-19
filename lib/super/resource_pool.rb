@@ -3,8 +3,11 @@ module Super
     ShuttingDownError = Class.new(StandardError)
     NoAvailableResourceError = Class.new(StandardError)
 
+    attr_reader :pool
+
     def initialize(size: 2)
       @lock = Mutex.new
+      @cv = ConditionVariable.new
       @pool = Array.new(size) { yield }
       @online = true
     end
@@ -16,18 +19,18 @@ module Super
     end
 
     def push(resource)
-      @lock.synchronize { @pool.push(resource) }
+      @lock.synchronize { @pool.push(resource) && @cv.broadcast }
     end
 
-    def pop
-      @lock.synchronize { @pool.pop }
+    def pop(timeout: 1, max_tries: 1)
+      @lock.synchronize { @pool.pop || checkout(now + timeout, max_tries) }
     end
 
-    def with(max_tries: 100, wait: 0.1)
-      raise ShuttingDownError unless @online
+    def with(timeout: 1, max_tries: 100)
+      @lock.synchronize { raise ShuttingDownError unless @online }
 
-      resource = checkout(max_tries, wait)
-      raise NoAvailableResourceError if resource.nil?
+      resource = pop(timeout: timeout, max_tries: max_tries)
+      raise NoAvailableResourceError unless resource
 
       yield(resource)
     ensure
@@ -41,17 +44,24 @@ module Super
 
     private
 
-    def checkout(max_tries, wait)
-      i = 0
+    def now
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
+    def checkout(deadline, max_tries)
+      tries = 0
 
       loop do
-        resource = pop
-        break resource unless resource.nil?
+        resource = @pool.pop
+        return resource if resource
 
-        i += 1
-        break if i >= max_tries
+        tries += 1
+        return if tries >= max_tries
 
-        sleep wait
+        wait_time = deadline - now
+        return if wait_time <= 0
+
+        @cv.wait(@lock, wait_time)
       end
     end
   end

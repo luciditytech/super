@@ -8,8 +8,8 @@ module Super
 
       def call(app)
         @app = WeakRef.new(app)
-        app.loader = setup_loader(load_paths)
         load_settings(settings_path)
+        setup_loader(load_paths)
         load_initializers(initializers_path)
       end
 
@@ -28,7 +28,7 @@ module Super
       end
 
       def setup_loader(load_paths)
-        Zeitwerk::Loader.new.tap do |l|
+        app.loader = Zeitwerk::Loader.new.tap do |l|
           load_paths.each { |path| l.push_dir(path) }
           l.enable_reloading
           l.setup

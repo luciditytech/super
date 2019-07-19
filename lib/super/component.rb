@@ -4,8 +4,6 @@ module Super
       base.extend(ClassMethods)
 
       base.class_eval do
-        extend SingleForwardable
-
         def self.instance
           @instance ||= new
         end
@@ -17,9 +15,11 @@ module Super
     end
 
     module ClassMethods
-      def interface(*args)
-        return def_delegators(:instance, *args) if args.is_a?(Array)
-        return def_delegator(:instance, args) if args.is_a?(Symbol)
+      def inst_delegate(*args)
+        [args].flatten.each do |method|
+          gen = Forwardable._delegator_method(self, :instance, method, method)
+          instance_eval(&gen)
+        end
       end
 
       def inst_accessor(*args)
@@ -32,16 +32,18 @@ module Super
       def inst_reader(*args)
         args.each do |method|
           attr_reader(method)
-          def_delegator(:instance, method)
+          inst_delegate(method)
         end
       end
 
       def inst_writer(*args)
         args.each do |method|
           attr_writer(method)
-          def_delegator(:instance, "#{method}=")
+          inst_delegate("#{method}=")
         end
       end
+
+      alias interface inst_delegate
     end
   end
 end
