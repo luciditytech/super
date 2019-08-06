@@ -6,12 +6,12 @@ module Super
 
         value.is_a?(Time) ? value : Time.iso8601(value)
       rescue ArgumentError
-        raise Super::Errors::DecodeError
+        raise Super::Errors::DecodeError, "#{value} as #{value.class}"
       end
 
       def encode(entity)
         return unless entity
-        raise Super::Errors::EncodeError unless entity.is_a?(Time)
+        raise Super::Errors::EncodeError, entity unless entity.is_a?(Time)
 
         entity.iso8601
       end
