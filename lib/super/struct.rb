@@ -1,7 +1,6 @@
 require_relative 'struct/attribute'
 require_relative 'struct/schema'
 require_relative 'codecs/time_codec'
-require_relative 'codecs/float_codec'
 
 module Super
   module Struct
