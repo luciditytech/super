@@ -23,7 +23,6 @@ end
 cache = Super::RedisCache
 cache.pool = pool
 
-
 data = Array.new(100_000) do
   Klass.new(
     id: SecureRandom.uuid,
