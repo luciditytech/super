@@ -33,7 +33,7 @@ Benchmark.ips do |x|
   x.report do
     10_000.times do
       entry = data.sample
-      cache.fetch(entry.id, ttl: 10) { entry }
+      cache.fetch(entry.id, ttl: 600) { entry }
     end
   end
 end
@@ -42,7 +42,7 @@ Benchmark.memory do |x|
   x.report do
     10_000.times do
       entry = data.sample
-      cache.fetch(entry.id, ttl: 10) { entry }
+      cache.fetch(entry.id, ttl: 600) { entry }
     end
   end
 end
