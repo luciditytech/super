@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'weakref'
 
 require_relative 'memory_cache/lock'
@@ -38,7 +40,7 @@ module Super
         return if entry.expired?
 
         bump(node)
-        entry.payload
+        Marshal.load(entry.payload)
       end
     end
 
@@ -91,7 +93,7 @@ module Super
 
     def store(key, value, options = {})
       ttl = options.fetch(:ttl, 10 * 60)
-      entry = Entry.new(key, value, expires_at: generate_expiration(ttl))
+      entry = Entry.new(key, Marshal.dump(value), expires_at: generate_expiration(ttl))
       node = Node.new(entry)
       @index[key] = node
       @data.append(node)
@@ -104,7 +106,7 @@ module Super
       node = @index[key]
 
       node.value.tap do |entry|
-        entry.payload = value
+        entry.payload = Marshal.dump(value)
         entry.expires_at = generate_expiration(ttl)
       end
 

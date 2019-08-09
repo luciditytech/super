@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'struct/attribute'
 require_relative 'struct/schema'
 require_relative 'codecs/time_codec'

@@ -7,6 +7,9 @@ Style/Documentation:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+Security/MarshalLoad:
+  Enabled: false
+
 Metrics/LineLength:
   Max: 100
 
