@@ -1,21 +1,25 @@
 module Super
   class RedisCache
-    attr_accessor :pool
+    include Super::Component
+
+    inst_accessor :pool
+    interface :read, :write, :expire, :fetch, :clear
 
     # this cache utilizes Redis' LRU / LFU mode capabilities
     # https://redis.io/topics/lru-cache
+
     def read(key)
-      res = @pool.with { |conn| conn.get(key) }
+      res = pool.with { |conn| conn.get(key) }
       res && decode(res)
     end
 
     def write(key, value, ttl:)
-      res = @pool.with { |conn| conn.setex(key, ttl, encode(value)) }
+      res = pool.with { |conn| conn.setex(key, ttl, encode(value)) }
       res == 'OK' ? value : nil
     end
 
     def expire(key)
-      res = @pool.with { |conn| conn.delete(key) }
+      res = pool.with { |conn| conn.delete(key) }
       res != 0
     end
 
@@ -29,7 +33,7 @@ module Super
     end
 
     def clear
-      @pool.with(&:flushdb)
+      pool.with(&:flushdb)
     end
 
     private
@@ -43,7 +47,7 @@ module Super
     end
 
     def check_and_retrieve(key)
-      @pool.with do |conn|
+      pool.with do |conn|
         conn.multi do
           conn.exists(key)
           conn.get(key)

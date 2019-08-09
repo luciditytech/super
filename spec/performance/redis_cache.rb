@@ -16,11 +16,13 @@ class Klass
   attribute :payload
 end
 
-cache = Super::RedisCache.new.tap do |config|
-  config.pool = ConnectionPool.new(size: 8) do
-    Redis.new
-  end
+pool = ConnectionPool.new(size: 8) do
+  Redis.new
 end
+
+cache = Super::RedisCache
+cache.pool = pool
+
 
 data = Array.new(100_000) do
   Klass.new(
