@@ -19,7 +19,7 @@ module Super
     end
 
     def expire(key)
-      res = pool.with { |conn| conn.delete(key) }
+      res = pool.with { |conn| conn.del(key) }
       res != 0
     end
 
