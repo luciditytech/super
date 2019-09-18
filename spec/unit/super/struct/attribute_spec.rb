@@ -116,5 +116,33 @@ RSpec.describe Super::Struct::Attribute do
         it { expect { subject }.to raise_error(Super::Errors::DecodeError) }
       end
     end
+
+    context 'when a String is defined' do
+      let(:options) { { type: String } }
+
+      include_context 'and the value is nil'
+
+      context 'and the value is a String object' do
+        let(:value) { 'my string' }
+
+        it { is_expected.to eq(value) }
+      end
+
+      context 'and the value is a convertable type' do
+        let(:value) { 100 }
+
+        it { is_expected.to eq(value.to_s) }
+      end
+
+      context 'and the value is not a convertable type' do
+        class NewDummyClass
+          undef :to_s
+        end
+
+        let(:value) { NewDummyClass.new }
+
+        it { expect { subject }.to raise_error(Super::Errors::DecodeError) }
+      end
+    end
   end
 end
