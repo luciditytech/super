@@ -22,6 +22,14 @@ module Super
       def keys
         @attributes.keys
       end
+
+      def clone
+        Schema.new.tap do |s|
+          each do |name, attribute|
+            s[name] = HashmapCloner.call(attribute.options)
+          end
+        end
+      end
     end
   end
 end

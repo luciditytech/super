@@ -1,11 +1,15 @@
+require_relative 'serializer/schema'
+
 module Super
   module Serializer
     def self.included(base)
       base.extend(ClassMethods)
       base.include(InstanceMethods)
+      base.include(Super::Service)
+      base.include(Super::Heritage)
 
       base.class_eval do
-        include Service
+        inherit :schema
       end
     end
 
@@ -23,9 +27,7 @@ module Super
       end
 
       def schema
-        @schema ||= {
-          attributes: {}
-        }
+        @schema ||= Schema.new
       end
     end
 

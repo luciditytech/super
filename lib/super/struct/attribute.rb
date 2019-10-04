@@ -3,7 +3,10 @@
 module Super
   module Struct
     class Attribute
+      attr_reader :options, :type, :decoder
+
       def initialize(options = {})
+        @options = options
         @type = options[:type]
         @decoder = decoder_for(options)
       end
