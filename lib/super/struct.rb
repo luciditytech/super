@@ -10,6 +10,11 @@ module Super
     def self.included(base)
       base.extend(ClassMethods)
       base.include(InstanceMethods)
+      base.include(Super::Heritage)
+
+      base.class_eval do
+        inherit :schema
+      end
     end
 
     module InstanceMethods
