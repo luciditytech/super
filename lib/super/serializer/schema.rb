@@ -24,7 +24,7 @@ module Super
       def clone
         Schema.new.tap do |s|
           @data[:attributes].each do |k, v|
-            s[:attributes][k] = HashmapCloner.call(v)
+            s[:attributes][k] = v.clone.merge(type: v[:type])
           end
 
           s[:root] = @data[:root]&.clone
