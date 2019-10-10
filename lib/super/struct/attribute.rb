@@ -23,6 +23,11 @@ module Super
       end
       # rubocop:enable Metrics/CyclomaticComplexity
 
+      def clone
+        cloned_options = @options.clone.merge(type: @options[:type])
+        Attribute.new(cloned_options)
+      end
+
       private
 
       def decoder_for(options)

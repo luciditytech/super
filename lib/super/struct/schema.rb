@@ -3,6 +3,8 @@
 module Super
   module Struct
     class Schema
+      attr_reader :attributes
+
       def initialize
         @attributes = {}
       end
@@ -25,8 +27,8 @@ module Super
 
       def clone
         Schema.new.tap do |s|
-          each do |name, attribute|
-            s[name] = HashmapCloner.call(attribute.options)
+          @attributes.each do |name, attribute|
+            s.attributes[name] = attribute.clone
           end
         end
       end
