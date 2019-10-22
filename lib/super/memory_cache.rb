@@ -54,7 +54,7 @@ module Super
       @lock.synchronize do
         return unless stored?(key)
 
-        node = index[key]
+        node = @index[key]
         remove(node)
       end
     end
